@@ -8,9 +8,9 @@ export function startBattle() {
     isAutoBattle = true;
     logBattle('⚔️ 전투를 시작합니다!');
 
-    // 💪 용맹에 따른 방어막 생성
+    // 💪 valor에 따른 방어막 생성
     characters.forEach(c => {
-        c.maxShield = c.bravery * 2;
+        c.maxShield = c.valor * 2;
         c.shield = c.maxShield;
         updateShieldBar(c);
         logBattle(`🛡️ ${c.name}의 용맹으로 방어막 +${c.shield}`);
@@ -67,7 +67,6 @@ function handleTurn(unit) {
 }
 
 function dealDamage(attacker, target, baseDamage, skillName) {
-    // 💥 방어막 비례 공격력 증폭
     const shieldRatio = attacker.shield && attacker.maxShield
         ? attacker.shield / attacker.maxShield
         : 0;
