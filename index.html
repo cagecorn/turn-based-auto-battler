@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>턴제 자동 전투 RPG</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Malgun Gothic', sans-serif;
+        }
+        
+        body {
+            background-color: #1e2328;
+            color: #e1e1e1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        
+        #game-container {
+            display: flex;
+            flex: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            width: 100%;
+        }
+        
+        #battle-area {
+            flex: 3;
+            display: flex;
+            flex-direction: column;
+            background-color: #2a2e35;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            margin-right: 20px;
+        }
+        
+        #battlefield {
+            flex: 1;
+            display: flex;
+            position: relative;
+            background: url('assets/battlefield-bg.jpg') no-repeat center center;
+            background-size: cover;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        #player-side, #enemy-side {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .formation-row {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .front-row, .back-row {
+            flex: 1;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 10px;
+        }
+        
+        .character-slot {
+            width: 80px;
+            height: 120px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            margin: 0 5px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+        
+        .character-slot:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+        
+        .character-sprite {
+            width: 64px;
+            height: 64px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center bottom;
+        }
+        
+        .character-info {
+            width: 100%;
+            padding: 5px;
+            font-size: 12px;
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 0 0 8px 8px;
+        }
+        
+        .hp-bar {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            right: 5px;
+            height: 5px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 3px;
+        }
+        
+        .hp-bar-fill {
+            height: 100%;
+            background-color: #2ecc71;
+            border-radius: 3px;
+            width: 100%;
+        }
+        
+        .shield-bar {
+            position: absolute;
+            top: 12px;
+            left: 5px;
+            right: 5px;
+            height: 5px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 3px;
+        }
+        
+        .shield-bar-fill {
+            height: 100%;
+            background-color: #3498db;
+            border-radius: 3px;
+            width: 70%;
+        }
+        
+        #battle-log {
+            height: 150px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 10px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        #battle-log p {
+            margin: 3px 0;
+        }
+        
+        #battle-log .damage {
+            color: #e74c3c;
+        }
+        
+        #battle-log .heal {
+            color: #2ecc71;
+        }
+        
+        #battle-log .shield {
+            color: #3498db;
+        }
+        
+        #battle-log .skill {
+            color: #f39c12;
+        }
+        
+        #sidebar {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .sidebar-panel {
+            background-color: #2a2e35;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .panel-title {
+            font-size: 18px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #3a3f48;
+            padding-bottom: 5px;
+        }
+        
+        #battle-control {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        #battle-control button {
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            background-color: #3a3f48;
+            color: #e1e1e1;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        #battle-control button:hover {
+            background-color: #4a4f58;
+        }
+        
+        #battle-control button:active {
+            background-color: #5a5f68;
+        }
+        
+        #battle-control #start-battle {
+            background-color: #27ae60;
+        }
+        
+        #battle-control #start-battle:hover {
+            background-color: #2ecc71;
+        }
+        
+        #battle-control #auto-battle {
+            background-color: #d35400;
+        }
+        
+        #battle-control #auto-battle:hover {
+            background-color: #e67e22;
+        }
+        
+        #mercenary-panel .mercenary-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .mercenary-item {
+            display: flex;
+            align-items: center;
+            background-color: #3a3f48;
+            border-radius: 4px;
+            padding: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .mercenary-item:hover {
+            background-color: #4a4f58;
+        }
+        
+        .mercenary-icon {
+            width: 40px;
+            height: 40px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+        
+        .mercenary-details {
+            flex: 1;
+        }
+        
+        .mercenary-name {
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .mercenary-class {
+            font-size: 12px;
+            color: #bdc3c7;
+        }
+        
+        #turn-order-panel .turn-list {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .turn-item {
+            display: flex;
+            align-items: center;
+            background-color: #3a3f48;
+            border-radius: 4px;
+            padding: 5px;
+        }
+        
+        .turn-icon {
+            width: 20px;
+            height: 20px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .turn-name {
+            flex: 1;
+            font-size: 12px;
+        }
+        
+        .turn-weight {
+            font-size: 12px;
+            color: #bdc3c7;
+            padding-right: 5px;
+        }
+        
+        .player-side {
+            color: #3498db;
+        }
+        
+        .enemy-side {
+            color: #e74c3c;
+        }
+        
+        .skill-animation {
+            position: absolute;
+            pointer-events: none;
+            z-index: 100;
+        }
+        
+        .damage-text {
+            position: absolute;
+            font-size: 18px;
+            font-weight: bold;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.7);
+            pointer-events: none;
+            z-index: 100;
+            animation: damage-float 1s forwards;
+        }
+        
+        @keyframes damage-float {
+            0% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+        }
+        
+        /* 모달 및 팝업 스타일 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background-color: #2a2e35;
+            border-radius: 8px;
+            padding: 20px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #3a3f48;
+            padding-bottom: 10px;
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #e1e1e1;
+            cursor: pointer;
+        }
+        
+        .modal-body {
+            margin-bottom: 15px;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            border-top: 1px solid #3a3f48;
+            padding-top: 10px;
+        }
+        
+        .modal-button {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .modal-button.primary {
+            background-color: #2980b9;
+            color: white;
+        }
+        
+        .modal-button.secondary {
+            background-color: #7f8c8d;
+            color: white;
+        }
+        
+        /* 전투 효과 애니메이션 */
+        @keyframes attack-shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+        
+        @keyframes skill-flash {
+            0% { background-color: rgba(255, 255, 255, 0); }
+            50% { background-color: rgba(255, 255, 255, 0.3); }
+            100% { background-color: rgba(255, 255, 255, 0); }
+        }
+        
+        .attack-animation {
+            animation: attack-shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        
+        .skill-animation {
+            animation: skill-flash 0.6s ease both;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="battle-area">
+            <div id="battlefield">
+                <div id="player-side">
+                    <div class="formation-row front-row">
+                        <div class="character-slot player-character" data-position="front-1">
+                            <div class="hp-bar"><div class="hp-bar-fill"></div></div>
+                            <div class="shield-bar"><div class="shield-bar-fill"></div></div>
+                            <div class="character-sprite" style="background-image: url('assets/warrior.png');"></div>
+                            <div class="character-info">전사</div>
+                        </div>
+                        <div class="character-slot player-character" data-position="front-2">
+                            <div class="hp-bar"><div class="hp-bar-fill" style="width: 80%;"></div></div>
+                            <div class="shield-bar"><div class="shield-bar-fill" style="width: 50%;"></div></div>
+                            <div class="character-sprite" style="background-image: url('assets/knight.png');"></div>
+                            <div class="character-info">기사</div>
+                        </div>
+                    </div>
+                    <div class="formation-row back-row">
+                        <div class="character-slot player-character" data-position="back-1">
+                            <div class="hp-bar"><div class="hp-bar-fill" style="width: 60%;"></div></div>
+                            <div class="shield-bar"><div class="shield-bar-fill" style="width: 30%;"></div></div>
+                            <div class="character-sprite" style="background-image: url('assets/mage.png');"></div>
+                            <div class="character-info">마법사</div>
+                        </div>
+                        <div class="character-slot player-character" data-position="back-2">
+                            <div class="hp-bar"><div class="hp-bar-fill" style="width: 90%;"></div></div>
+                            <div class="shield-bar"><div class="shield-bar-fill" style="width: 40%;"></div></div>
+                            <div class="character-sprite" style="background-image: url('assets/healer.png');"></div>
+                            <div class="character-info">힐러</div>
+                        </div>
+                    </div>
+                </div>
+                <div id="enemy-side">
+                    <div class="formation-row front-row">
+                        <div class="character-slot enemy-character" data-position="front-1">
+                            <div class="hp-bar"><div class="hp-bar-fill" style="width: 70%;"></div></div>
+                            <div class="shield-bar"><div class="shield-bar-fill" style="width: 20%;"></div></div>
+                            <div class="character-sprite" style="background-image: url('assets/goblin.png');"></div>
+                            <div class="character-info">고블린</div>
+                        </div>
+                        <div class="character-slot enemy-character" data-position="front-2">
+                            <div class="hp-bar"><div class="hp-bar-fill" style="width: 90%;"></div></div>
+                            <div class="shield-bar"><div class="shield-bar-fill" style="width: 60%;"></div></div>
+                            <div class="character-sprite" style="background-image: url('assets/orc.png');"></div>
+                            <div class="character-info">오크</div>
+                        </div>
+                    </div>
+                    <div class="formation-row back-row">
+                        <div class="character-slot enemy-character" data-position="back-1">
+                            <div class="hp-bar"><div class="hp-bar-fill" style="width: 50%;"></div></div>
+                            <div class="shield-bar"><div class="shield-bar-fill" style="width: 10%;"></div></div>
+                            <div class="character-sprite" style="background-image: url('assets/shaman.png');"></div>
+                            <div class="character-info">샤먼</div>
+                        </div>
+                        <div class="character-slot enemy-character" data-position="back-2">
+                            <div class="hp-bar"><div class="hp-bar-fill" style="width: 85%;"></div></div>
+                            <div class="shield-bar"><div class="shield-bar-fill" style="width: 0%;"></div></div>
+                            <div class="character-sprite" style="background-image: url('assets/archer.png');"></div>
+                            <div class="character-info">궁수</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="battle-log">
+                <p>전투가 시작되었습니다.</p>
+                <p class="damage">전사가 고블린에게 <strong>45</strong> 데미지를 입혔습니다.</p>
+                <p class="skill">마법사가 <strong>파이어 월</strong> 스킬을 사용했습니다.</p>
+                <p class="damage">마법사가 오크에게 <strong>30</strong> 데미지를 입혔습니다.</p>
+                <p class="damage">마법사가 고블린에게 <strong>30</strong> 데미지를 입혔습니다.</p>
+                <p class="heal">힐러가 전사를 <strong>25</strong> 회복시켰습니다.</p>
+                <p class="shield">기사가 자신에게 <strong>15</strong> 방어막을 생성했습니다.</p>
+            </div>
+        </div>
+        <div id="sidebar">
+            <div class="sidebar-panel" id="battle-control">
+                <div class="panel-title">전투 조작</div>
+                <button id="start-battle">전투 시작</button>
+                <button id="auto-battle">자동 전투</button>
+                <button id="skip-battle">전투 건너뛰기</button>
+                <button id="retreat">후퇴</button>
+            </div>
+            <div class="sidebar-panel" id="turn-order-panel">
+                <div class="panel-title">턴 순서</div>
+                <div class="turn-list">
+                    <div class="turn-item player-side">
+                        <div class="turn-icon"></div>
+                        <div class="turn-name">전사</div>
+                        <div class="turn-weight">12</div>
+                    </div>
+                    <div class="turn-item player-side">
+                        <div class="turn-icon"></div>
+                        <div class="turn-name">마법사</div>
+                        <div class="turn-weight">15</div>
+                    </div>
+                    <div class="turn-item enemy-side">
+                        <div class="turn-icon"></div>
+                        <div class="turn-name">고블린</div>
+                        <div class="turn-weight">18</div>
+                    </div>
+                    <div class="turn-item player-side">
+                        <div class="turn-icon"></div>
+                        <div class="turn-name">기사</div>
+                        <div class="turn-weight">20</div>
+                    </div>
+                    <div class="turn-item enemy-side">
+                        <div class="turn-icon"></div>
+                        <div class="turn-name">샤먼</div>
+                        <div class="turn-weight">22</div>
+                    </div>
+                    <div class="turn-item player-side">
+                        <div class="turn-icon"></div>
+                        <div class="turn-name">힐러</div>
+                        <div class="turn-weight">25</div>
+                    </div>
+                    <div class="turn-item enemy-side">
+                        <div class="turn-icon"></div>
+                        <div class="turn-name">오크</div>
+                        <div class="turn-weight">28</div>
+                    </div>
+                    <div class="turn-item enemy-side">
+                        <div class="turn-icon"></div>
+                        <div class="turn-name">궁수</div>
+                        <div class="turn-weight">30</div>
+                    </div>
+                </div>
+            </div>
+            <div class="sidebar-panel" id="mercenary-panel">
+                <div class="panel-title">용병 목록</div>
+                <div class="mercenary-list">
+                    <div class="mercenary-item">
+                        <div class="mercenary-icon"></div>
+                        <div class="mercenary-details">
+                            <div class="mercenary-name">강철의 로간</div>
+                            <div class="mercenary-class">전사 Lv.5</div>
+                        </div>
+                    </div>
+                    <div class="mercenary-item">
+                        <div class="mercenary-icon"></div>
+                        <div class="mercenary-details">
+                            <div class="mercenary-name">불꽃의 아이리스</div>
+                            <div class="mercenary-class">마법사 Lv.4</div>
+                        </div>
+                    </div>
+                    <div class="mercenary-item">
+                        <div class="mercenary-icon"></div>
+                        <div class="mercenary-details">
+                            <div class="mercenary-name">빛의 미아</div>
+                            <div class="mercenary-class">힐러 Lv.3</div>
+                        </div>
+                    </div>
+                    <div class="mercenary-item">
+                        <div class="mercenary-icon"></div>
+                        <div class="mercenary-details">
+                            <div class="mercenary-name">방패의 토르</div>
+                            <div class="mercenary-class">기사 Lv.5</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 용병 정보 모달 -->
+    <div id="mercenary-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">용병 정보</div>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- 용병 정보가 들어갈 자리 -->
+            </div>
+            <div class="modal-footer">
+                <button class="modal-button secondary">취소</button>
+                <button class="modal-button primary">배치</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 게임 스크립트 -->
+    <script src="js/game.js"></script>
+    <script src="js/battle.js"></script>
+    <script src="js/character.js"></script>
+    <script src="js/skill.js"></script>
+    <script src="js/ui.js"></script>
+</body>
+</html>
