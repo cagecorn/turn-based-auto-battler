@@ -6,7 +6,16 @@ let isAutoBattle = false;
 
 export function startBattle() {
     isAutoBattle = true;
-    logBattle('전투를 시작합니다!');
+    logBattle('⚔️ 전투를 시작합니다!');
+
+    // 💪 용맹에 따른 방어막 생성
+    characters.forEach(c => {
+        c.maxShield = c.bravery * 2;
+        c.shield = c.maxShield;
+        updateShieldBar(c);
+        logBattle(`🛡️ ${c.name}의 용맹으로 방어막 +${c.shield}`);
+    });
+
     autoBattleLoop();
 }
 
@@ -40,7 +49,6 @@ function handleTurn(unit) {
 
     const skill = getRandomSkill(unit.skills);
     if (!skill) {
-        // 평타
         const target = getRandomTarget(enemies);
         if (!target) return;
         dealDamage(unit, target, 10, '기본 평타');
@@ -58,10 +66,23 @@ function handleTurn(unit) {
     }
 }
 
-function dealDamage(attacker, target, damage, skillName) {
-    let effectiveDamage = damage;
+function dealDamage(attacker, target, baseDamage, skillName) {
+    // 💥 방어막 비례 공격력 증폭
+    const shieldRatio = attacker.shield && attacker.maxShield
+        ? attacker.shield / attacker.maxShield
+        : 0;
+
+    const damageBoost = Math.floor(baseDamage * (0.3 * shieldRatio));
+    const totalDamage = baseDamage + damageBoost;
+
+    if (damageBoost > 0) {
+        logBattle(`🔥 ${attacker.name}의 용맹 효과로 공격력 +${damageBoost}!`);
+    }
+
+    let effectiveDamage = totalDamage;
+
     if (target.shield > 0) {
-        const shieldAbsorb = Math.min(target.shield, damage);
+        const shieldAbsorb = Math.min(target.shield, effectiveDamage);
         target.shield -= shieldAbsorb;
         effectiveDamage -= shieldAbsorb;
         updateShieldBar(target);
@@ -71,6 +92,7 @@ function dealDamage(attacker, target, damage, skillName) {
     target.hp -= effectiveDamage;
     if (target.hp < 0) target.hp = 0;
     updateHpBar(target);
+
     logBattle(`⚔️ ${attacker.name}의 ${skillName}! ${target.name}에게 ${effectiveDamage} 데미지!`);
 
     if (target.hp <= 0) {
