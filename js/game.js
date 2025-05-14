@@ -12,11 +12,12 @@ const Game = (() => {
     };
 
     // 초기화
+    import { startBattle } from './battle.js';
+    
     function init() {
         console.log("게임 초기화 중...");
         loadGameData();
         UI.init();
-        import { startBattle } from './battle.js';
 startBattle();
         bindEvents();
         console.log("게임 초기화 완료!");
