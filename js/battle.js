@@ -4,7 +4,7 @@ import { updateHpBar, updateShieldBar, logBattle } from './ui.js';
 
 let isAutoBattle = false;
 
-export function startBattle() {
+function startBattle() {
     isAutoBattle = true;
     logBattle('⚔️ 전투를 시작합니다!');
 
@@ -17,6 +17,27 @@ export function startBattle() {
     });
 
     autoBattleLoop();
+}
+
+function startAutoBattle() {
+    if (!isAutoBattle) {
+        isAutoBattle = true;
+        autoBattleLoop();
+    }
+}
+
+function stopAutoBattle() {
+    isAutoBattle = false;
+}
+
+function skipBattle() {
+    endBattle(getTeamAlive('player'));
+}
+
+function endBattle(playerWon = true) {
+    isAutoBattle = false;
+    const winner = playerWon ? '🎉 플레이어 승리!' : '💀 적 승리...';
+    logBattle(`<strong>${winner}</strong>`);
 }
 
 async function autoBattleLoop() {
@@ -118,3 +139,11 @@ function isBattleOver() {
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
+
+export const BattleManager = {
+    startBattle,
+    startAutoBattle,
+    stopAutoBattle,
+    skipBattle,
+    endBattle
+};
