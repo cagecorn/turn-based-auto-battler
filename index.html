@@ -44,8 +44,7 @@
             flex: 1;
             display: flex;
             position: relative;
-            background: url('assets/battlefield-bg.jpg') no-repeat center center;
-            background-size: cover;
+            background-color: #3a3f48;
             border-radius: 8px;
             overflow: hidden;
             margin-bottom: 20px;
@@ -94,9 +93,10 @@
         .character-sprite {
             width: 64px;
             height: 64px;
-            background-size: contain;
-            background-repeat: no-repeat;
-            background-position: center bottom;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
         }
         
         .character-info {
@@ -261,6 +261,22 @@
             background-color: rgba(0, 0, 0, 0.3);
             border-radius: 4px;
             margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .mercenary-portrait {
+            width: 80px;
+            height: 120px;
+            margin: 0 auto 15px;
+            background-color: #3a3f48;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            border-radius: 4px;
         }
         
         .mercenary-details {
@@ -454,13 +470,13 @@
                         <div class="character-slot player-character" data-position="front-1">
                             <div class="hp-bar"><div class="hp-bar-fill"></div></div>
                             <div class="shield-bar"><div class="shield-bar-fill"></div></div>
-                            <div class="character-sprite" style="background-image: url('assets/warrior.png');"></div>
+                            <div class="character-sprite">⚔️</div>
                             <div class="character-info">전사</div>
                         </div>
                         <div class="character-slot player-character" data-position="front-2">
                             <div class="hp-bar"><div class="hp-bar-fill" style="width: 80%;"></div></div>
                             <div class="shield-bar"><div class="shield-bar-fill" style="width: 50%;"></div></div>
-                            <div class="character-sprite" style="background-image: url('assets/knight.png');"></div>
+                            <div class="character-sprite">🛡️</div>
                             <div class="character-info">기사</div>
                         </div>
                     </div>
@@ -468,13 +484,13 @@
                         <div class="character-slot player-character" data-position="back-1">
                             <div class="hp-bar"><div class="hp-bar-fill" style="width: 60%;"></div></div>
                             <div class="shield-bar"><div class="shield-bar-fill" style="width: 30%;"></div></div>
-                            <div class="character-sprite" style="background-image: url('assets/mage.png');"></div>
+                            <div class="character-sprite">🔮</div>
                             <div class="character-info">마법사</div>
                         </div>
                         <div class="character-slot player-character" data-position="back-2">
                             <div class="hp-bar"><div class="hp-bar-fill" style="width: 90%;"></div></div>
                             <div class="shield-bar"><div class="shield-bar-fill" style="width: 40%;"></div></div>
-                            <div class="character-sprite" style="background-image: url('assets/healer.png');"></div>
+                            <div class="character-sprite">✨</div>
                             <div class="character-info">힐러</div>
                         </div>
                     </div>
@@ -484,13 +500,13 @@
                         <div class="character-slot enemy-character" data-position="front-1">
                             <div class="hp-bar"><div class="hp-bar-fill" style="width: 70%;"></div></div>
                             <div class="shield-bar"><div class="shield-bar-fill" style="width: 20%;"></div></div>
-                            <div class="character-sprite" style="background-image: url('assets/goblin.png');"></div>
+                            <div class="character-sprite">👺</div>
                             <div class="character-info">고블린</div>
                         </div>
                         <div class="character-slot enemy-character" data-position="front-2">
                             <div class="hp-bar"><div class="hp-bar-fill" style="width: 90%;"></div></div>
                             <div class="shield-bar"><div class="shield-bar-fill" style="width: 60%;"></div></div>
-                            <div class="character-sprite" style="background-image: url('assets/orc.png');"></div>
+                            <div class="character-sprite">👹</div>
                             <div class="character-info">오크</div>
                         </div>
                     </div>
@@ -498,13 +514,13 @@
                         <div class="character-slot enemy-character" data-position="back-1">
                             <div class="hp-bar"><div class="hp-bar-fill" style="width: 50%;"></div></div>
                             <div class="shield-bar"><div class="shield-bar-fill" style="width: 10%;"></div></div>
-                            <div class="character-sprite" style="background-image: url('assets/shaman.png');"></div>
+                            <div class="character-sprite">🧙</div>
                             <div class="character-info">샤먼</div>
                         </div>
                         <div class="character-slot enemy-character" data-position="back-2">
                             <div class="hp-bar"><div class="hp-bar-fill" style="width: 85%;"></div></div>
                             <div class="shield-bar"><div class="shield-bar-fill" style="width: 0%;"></div></div>
-                            <div class="character-sprite" style="background-image: url('assets/archer.png');"></div>
+                            <div class="character-sprite">🏹</div>
                             <div class="character-info">궁수</div>
                         </div>
                     </div>
@@ -577,28 +593,28 @@
                 <div class="panel-title">용병 목록</div>
                 <div class="mercenary-list">
                     <div class="mercenary-item">
-                        <div class="mercenary-icon"></div>
+                        <div class="mercenary-icon">⚔️</div>
                         <div class="mercenary-details">
                             <div class="mercenary-name">강철의 로간</div>
                             <div class="mercenary-class">전사 Lv.5</div>
                         </div>
                     </div>
                     <div class="mercenary-item">
-                        <div class="mercenary-icon"></div>
+                        <div class="mercenary-icon">🔮</div>
                         <div class="mercenary-details">
                             <div class="mercenary-name">불꽃의 아이리스</div>
                             <div class="mercenary-class">마법사 Lv.4</div>
                         </div>
                     </div>
                     <div class="mercenary-item">
-                        <div class="mercenary-icon"></div>
+                        <div class="mercenary-icon">✨</div>
                         <div class="mercenary-details">
                             <div class="mercenary-name">빛의 미아</div>
                             <div class="mercenary-class">힐러 Lv.3</div>
                         </div>
                     </div>
                     <div class="mercenary-item">
-                        <div class="mercenary-icon"></div>
+                        <div class="mercenary-icon">🛡️</div>
                         <div class="mercenary-details">
                             <div class="mercenary-name">방패의 토르</div>
                             <div class="mercenary-class">기사 Lv.5</div>
