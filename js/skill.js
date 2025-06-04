@@ -1,5 +1,5 @@
 // 스킬 관리 모듈
-const SkillManager = (() => {
+export const SkillManager = (() => {
     // 스킬 타입 정의
     const skillTypes = {
         individual: '개별',     // 앞열 랜덤 1명 공격
@@ -378,3 +378,28 @@ const SkillManager = (() => {
         skillTypes
     };
 })();
+
+// 스킬 배열에서 확률에 따라 스킬을 선택
+export function getRandomSkill(skills = []) {
+    if (!skills || skills.length === 0) return null;
+
+    const weights = [0.6, 0.4, 0.2];
+    const available = skills.slice(0, 3);
+    const total = weights.slice(0, available.length).reduce((a, b) => a + b, 0);
+    let r = Math.random() * total;
+
+    for (let i = 0; i < available.length; i++) {
+        const w = weights[i];
+        if (r < w) {
+            const skill = { ...available[i] };
+            if (skill.type === 'heal') {
+                skill.amount = Math.floor(10 * (skill.multiplier || 1));
+            } else {
+                skill.damage = Math.floor(10 * (skill.multiplier || 1));
+            }
+            return skill;
+        }
+        r -= w;
+    }
+    return null;
+}

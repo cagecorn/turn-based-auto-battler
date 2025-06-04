@@ -1,4 +1,5 @@
 import { BattleManager } from './battle.js';
+import { CharacterFactory, ItemFactory } from './character.js';
 
 // 게임 전체를 관리하는 모듈
 const Game = (() => {

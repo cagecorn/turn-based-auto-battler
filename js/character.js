@@ -1,5 +1,5 @@
 // 캐릭터 관리 모듈
-const CharacterFactory = (() => {
+export const CharacterFactory = (() => {
     // 캐릭터 ID 생성 카운터
     let idCounter = 1;
     
@@ -524,7 +524,7 @@ const CharacterFactory = (() => {
 })();
 
 // 아이템 팩토리 모듈
-const ItemFactory = (() => {
+export const ItemFactory = (() => {
     // 아이템 ID 생성 카운터
     let idCounter = 1;
     
@@ -673,3 +673,15 @@ const ItemFactory = (() => {
         createRandomItem
     };
 })();
+
+// 전투에 사용할 기본 캐릭터 배열
+const player1 = CharacterFactory.createMercenary('warrior', '전사', 1);
+player1.team = 'player';
+const player2 = CharacterFactory.createMercenary('mage', '마법사', 1);
+player2.team = 'player';
+const enemy1 = CharacterFactory.createEnemy('goblin', '고블린', 1);
+enemy1.team = 'enemy';
+const enemy2 = CharacterFactory.createEnemy('orc', '오크', 1);
+enemy2.team = 'enemy';
+
+export const characters = [player1, player2, enemy1, enemy2];
