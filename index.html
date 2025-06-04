@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>턴제 자동 전투 RPG</title>
+    <title>🎮 턴제 자동 전투 RPG</title>
     <style>
         * {
             margin: 0;
@@ -13,7 +13,7 @@
         }
         
         body {
-            background-color: #1e2328;
+            background: linear-gradient(135deg, #1e2328 0%, #2c3e50 100%);
             color: #e1e1e1;
             display: flex;
             flex-direction: column;
@@ -33,27 +33,59 @@
             flex: 3;
             display: flex;
             flex-direction: column;
-            background-color: #2a2e35;
-            border-radius: 8px;
+            background: linear-gradient(145deg, #2a2e35, #34495e);
+            border-radius: 15px;
             padding: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             margin-right: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
         }
         
         #battlefield {
             flex: 1;
             display: flex;
             position: relative;
-            background-color: #3a3f48;
-            border-radius: 8px;
+            background: linear-gradient(180deg, #87CEEB 0%, #228B22 70%, #8B4513 100%);
+            border-radius: 15px;
             overflow: hidden;
             margin-bottom: 20px;
+            border: 3px solid #DAA520;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.3);
         }
         
         #player-side, #enemy-side {
             flex: 1;
             display: flex;
             flex-direction: column;
+            position: relative;
+        }
+        
+        #player-side::before {
+            content: "🏰 아군 진영";
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(52, 152, 219, 0.8);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            z-index: 10;
+        }
+        
+        #enemy-side::before {
+            content: "💀 적군 진영";
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(231, 76, 60, 0.8);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            z-index: 10;
         }
         
         .formation-row {
@@ -68,109 +100,161 @@
             display: flex;
             justify-content: space-around;
             align-items: center;
-            padding: 10px;
+            padding: 15px;
         }
         
         .character-slot {
-            width: 80px;
-            height: 120px;
-            background-color: rgba(0, 0, 0, 0.3);
-            border-radius: 8px;
-            margin: 0 5px;
+            width: 90px;
+            height: 130px;
+            background: linear-gradient(145deg, rgba(0, 0, 0, 0.3), rgba(255, 255, 255, 0.1));
+            border-radius: 15px;
+            margin: 0 8px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: flex-end;
             position: relative;
-            transition: transform 0.3s ease;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
         }
         
         .character-slot:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
         }
         
         .character-sprite {
-            width: 64px;
-            height: 64px;
+            width: 60px;
+            height: 60px;
+            font-size: 48px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 40px;
+            margin: 10px 0;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
         }
         
         .character-info {
             width: 100%;
-            padding: 5px;
-            font-size: 12px;
+            padding: 8px;
+            font-size: 11px;
             text-align: center;
-            background-color: rgba(0, 0, 0, 0.5);
-            border-radius: 0 0 8px 8px;
+            background: linear-gradient(145deg, rgba(0, 0, 0, 0.6), rgba(255, 255, 255, 0.1));
+            border-radius: 0 0 13px 13px;
+            font-weight: bold;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
         }
         
         .hp-bar {
             position: absolute;
-            top: 5px;
-            left: 5px;
-            right: 5px;
-            height: 5px;
-            background-color: rgba(0, 0, 0, 0.5);
+            top: 8px;
+            left: 8px;
+            right: 8px;
+            height: 6px;
+            background: linear-gradient(90deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.3));
             border-radius: 3px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         
         .hp-bar-fill {
             height: 100%;
-            background-color: #2ecc71;
+            background: linear-gradient(90deg, #e74c3c, #2ecc71);
             border-radius: 3px;
-            width: 100%;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+        
+        .hp-bar-fill::after {
+            content: "❤️";
+            position: absolute;
+            right: 2px;
+            top: -8px;
+            font-size: 8px;
+            filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5));
         }
         
         .shield-bar {
             position: absolute;
-            top: 12px;
-            left: 5px;
-            right: 5px;
-            height: 5px;
-            background-color: rgba(0, 0, 0, 0.5);
+            top: 18px;
+            left: 8px;
+            right: 8px;
+            height: 6px;
+            background: linear-gradient(90deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.3));
             border-radius: 3px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         
         .shield-bar-fill {
             height: 100%;
-            background-color: #3498db;
+            background: linear-gradient(90deg, #3498db, #9b59b6);
             border-radius: 3px;
-            width: 70%;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+        
+        .shield-bar-fill::after {
+            content: "🛡️";
+            position: absolute;
+            right: 2px;
+            top: -8px;
+            font-size: 8px;
+            filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5));
         }
         
         #battle-log {
             height: 150px;
-            background-color: rgba(0, 0, 0, 0.3);
-            border-radius: 8px;
-            padding: 10px;
+            background: linear-gradient(145deg, rgba(0, 0, 0, 0.4), rgba(255, 255, 255, 0.05));
+            border-radius: 15px;
+            padding: 15px;
             overflow-y: auto;
-            font-family: monospace;
-            font-size: 14px;
-            line-height: 1.4;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        #battle-log::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        #battle-log::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+        
+        #battle-log::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
         }
         
         #battle-log p {
-            margin: 3px 0;
+            margin: 4px 0;
+            padding: 2px 0;
         }
         
         #battle-log .damage {
-            color: #e74c3c;
+            color: #ff6b6b;
+            text-shadow: 0 0 3px rgba(255, 107, 107, 0.5);
         }
         
         #battle-log .heal {
-            color: #2ecc71;
+            color: #51cf66;
+            text-shadow: 0 0 3px rgba(81, 207, 102, 0.5);
         }
         
         #battle-log .shield {
-            color: #3498db;
+            color: #74c0fc;
+            text-shadow: 0 0 3px rgba(116, 192, 252, 0.5);
         }
         
         #battle-log .skill {
-            color: #f39c12;
+            color: #ffd43b;
+            text-shadow: 0 0 3px rgba(255, 212, 59, 0.5);
         }
         
         #sidebar {
@@ -181,102 +265,120 @@
         }
         
         .sidebar-panel {
-            background-color: #2a2e35;
-            border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(145deg, #2a2e35, #34495e);
+            border-radius: 15px;
+            padding: 18px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
         }
         
         .panel-title {
-            font-size: 18px;
-            margin-bottom: 10px;
-            border-bottom: 1px solid #3a3f48;
-            padding-bottom: 5px;
+            font-size: 16px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 8px;
+            font-weight: bold;
+            text-align: center;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
         
         #battle-control {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
         }
         
         #battle-control button {
-            padding: 10px;
+            padding: 12px;
             border: none;
-            border-radius: 4px;
-            background-color: #3a3f48;
+            border-radius: 10px;
+            background: linear-gradient(145deg, #3a3f48, #2c3e50);
             color: #e1e1e1;
-            font-size: 16px;
+            font-size: 14px;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(255, 255, 255, 0.1);
         }
         
         #battle-control button:hover {
-            background-color: #4a4f58;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.3);
         }
         
         #battle-control button:active {
-            background-color: #5a5f68;
+            transform: translateY(0);
         }
         
         #battle-control #start-battle {
-            background-color: #27ae60;
+            background: linear-gradient(145deg, #27ae60, #2ecc71);
         }
         
         #battle-control #start-battle:hover {
-            background-color: #2ecc71;
+            background: linear-gradient(145deg, #2ecc71, #58d68d);
         }
         
         #battle-control #auto-battle {
-            background-color: #d35400;
+            background: linear-gradient(145deg, #d35400, #e67e22);
         }
         
         #battle-control #auto-battle:hover {
-            background-color: #e67e22;
+            background: linear-gradient(145deg, #e67e22, #f39c12);
+        }
+        
+        #battle-control #skip-battle {
+            background: linear-gradient(145deg, #8e44ad, #9b59b6);
+        }
+        
+        #battle-control #skip-battle:hover {
+            background: linear-gradient(145deg, #9b59b6, #bb6bd9);
+        }
+        
+        #battle-control #retreat {
+            background: linear-gradient(145deg, #c0392b, #e74c3c);
+        }
+        
+        #battle-control #retreat:hover {
+            background: linear-gradient(145deg, #e74c3c, #ec7063);
         }
         
         #mercenary-panel .mercenary-list {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
         }
         
         .mercenary-item {
             display: flex;
             align-items: center;
-            background-color: #3a3f48;
-            border-radius: 4px;
-            padding: 5px;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.1));
+            border-radius: 10px;
+            padding: 8px;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .mercenary-item:hover {
-            background-color: #4a4f58;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.05));
+            transform: translateX(5px);
+            border-color: rgba(255, 255, 255, 0.3);
         }
         
         .mercenary-icon {
-            width: 40px;
-            height: 40px;
-            background-color: rgba(0, 0, 0, 0.3);
-            border-radius: 4px;
-            margin-right: 10px;
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(145deg, rgba(0, 0, 0, 0.3), rgba(255, 255, 255, 0.1));
+            border-radius: 8px;
+            margin-right: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 24px;
-        }
-
-        .mercenary-portrait {
-            width: 80px;
-            height: 120px;
-            margin: 0 auto 15px;
-            background-color: #3a3f48;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 48px;
-            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         
         .mercenary-details {
@@ -284,180 +386,159 @@
         }
         
         .mercenary-name {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: bold;
+            margin-bottom: 2px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
         }
         
         .mercenary-class {
-            font-size: 12px;
+            font-size: 11px;
             color: #bdc3c7;
+            opacity: 0.8;
         }
         
         #turn-order-panel .turn-list {
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 6px;
         }
         
         .turn-item {
             display: flex;
             align-items: center;
-            background-color: #3a3f48;
-            border-radius: 4px;
-            padding: 5px;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.1));
+            border-radius: 8px;
+            padding: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .turn-item:hover {
+            transform: scale(1.02);
+            border-color: rgba(255, 255, 255, 0.3);
         }
         
         .turn-icon {
-            width: 20px;
-            height: 20px;
-            background-color: rgba(0, 0, 0, 0.3);
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
             margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         
         .turn-name {
             flex: 1;
             font-size: 12px;
+            font-weight: bold;
         }
         
         .turn-weight {
-            font-size: 12px;
+            font-size: 11px;
             color: #bdc3c7;
-            padding-right: 5px;
+            padding: 2px 6px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+            font-weight: bold;
         }
         
         .player-side {
-            color: #3498db;
+            color: #74c0fc;
+            text-shadow: 0 0 3px rgba(116, 192, 252, 0.5);
+        }
+        
+        .player-side .turn-icon {
+            background: linear-gradient(145deg, #3498db, #74c0fc);
         }
         
         .enemy-side {
-            color: #e74c3c;
+            color: #ff6b6b;
+            text-shadow: 0 0 3px rgba(255, 107, 107, 0.5);
         }
         
-        .skill-animation {
-            position: absolute;
-            pointer-events: none;
-            z-index: 100;
+        .enemy-side .turn-icon {
+            background: linear-gradient(145deg, #e74c3c, #ff6b6b);
         }
         
         .damage-text {
             position: absolute;
-            font-size: 18px;
+            font-size: 20px;
             font-weight: bold;
-            text-shadow: 0 0 5px rgba(0, 0, 0, 0.7);
+            text-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
             pointer-events: none;
             z-index: 100;
-            animation: damage-float 1s forwards;
+            animation: damage-float 1.2s forwards;
         }
         
         @keyframes damage-float {
             0% {
                 opacity: 1;
-                transform: translateY(0);
+                transform: translateY(0) scale(1);
+            }
+            50% {
+                transform: translateY(-20px) scale(1.2);
             }
             100% {
                 opacity: 0;
-                transform: translateY(-30px);
+                transform: translateY(-40px) scale(0.8);
             }
         }
         
-        /* 모달 및 팝업 스타일 */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .modal-content {
-            background-color: #2a2e35;
-            border-radius: 8px;
-            padding: 20px;
-            max-width: 500px;
-            width: 100%;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-        
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            border-bottom: 1px solid #3a3f48;
-            padding-bottom: 10px;
-        }
-        
-        .modal-title {
-            font-size: 20px;
-            font-weight: bold;
-        }
-        
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 20px;
-            color: #e1e1e1;
-            cursor: pointer;
-        }
-        
-        .modal-body {
-            margin-bottom: 15px;
-        }
-        
-        .modal-footer {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            border-top: 1px solid #3a3f48;
-            padding-top: 10px;
-        }
-        
-        .modal-button {
-            padding: 8px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        
-        .modal-button.primary {
-            background-color: #2980b9;
-            color: white;
-        }
-        
-        .modal-button.secondary {
-            background-color: #7f8c8d;
-            color: white;
-        }
-        
-        /* 전투 효과 애니메이션 */
         @keyframes attack-shake {
             0% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            50% { transform: translateX(5px); }
-            75% { transform: translateX(-5px); }
-            100% { transform: translateX(0); }
+            25% { transform: translateX(-8px) rotate(-2deg); }
+            50% { transform: translateX(8px) rotate(2deg); }
+            75% { transform: translateX(-8px) rotate(-1deg); }
+            100% { transform: translateX(0) rotate(0deg); }
         }
         
-        @keyframes skill-flash {
-            0% { background-color: rgba(255, 255, 255, 0); }
-            50% { background-color: rgba(255, 255, 255, 0.3); }
-            100% { background-color: rgba(255, 255, 255, 0); }
+        @keyframes skill-glow {
+            0% { 
+                box-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+                filter: brightness(1);
+            }
+            50% { 
+                box-shadow: 0 0 20px rgba(255, 215, 0, 0.8), 0 0 30px rgba(255, 255, 255, 0.5);
+                filter: brightness(1.5);
+            }
+            100% { 
+                box-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+                filter: brightness(1);
+            }
         }
         
         .attack-animation {
-            animation: attack-shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+            animation: attack-shake 0.6s cubic-bezier(.36,.07,.19,.97) both;
         }
         
         .skill-animation {
-            animation: skill-flash 0.6s ease both;
+            animation: skill-glow 0.8s ease both;
+        }
+        
+        /* 반응형 디자인 */
+        @media (max-width: 768px) {
+            #game-container {
+                flex-direction: column;
+                padding: 10px;
+            }
+            
+            #battle-area {
+                margin-right: 0;
+                margin-bottom: 20px;
+            }
+            
+            .character-slot {
+                width: 70px;
+                height: 100px;
+            }
+            
+            .character-sprite {
+                font-size: 32px;
+            }
         }
     </style>
 </head>
@@ -470,14 +551,14 @@
                         <div class="character-slot player-character" data-position="front-1">
                             <div class="hp-bar"><div class="hp-bar-fill"></div></div>
                             <div class="shield-bar"><div class="shield-bar-fill"></div></div>
-                            <div class="character-sprite">⚔️</div>
-                            <div class="character-info">전사</div>
+                            <div class="character-sprite">🗡️</div>
+                            <div class="character-info">⚔️ 전사</div>
                         </div>
                         <div class="character-slot player-character" data-position="front-2">
                             <div class="hp-bar"><div class="hp-bar-fill" style="width: 80%;"></div></div>
                             <div class="shield-bar"><div class="shield-bar-fill" style="width: 50%;"></div></div>
                             <div class="character-sprite">🛡️</div>
-                            <div class="character-info">기사</div>
+                            <div class="character-info">🏰 기사</div>
                         </div>
                     </div>
                     <div class="formation-row back-row">
@@ -485,13 +566,13 @@
                             <div class="hp-bar"><div class="hp-bar-fill" style="width: 60%;"></div></div>
                             <div class="shield-bar"><div class="shield-bar-fill" style="width: 30%;"></div></div>
                             <div class="character-sprite">🔮</div>
-                            <div class="character-info">마법사</div>
+                            <div class="character-info">✨ 마법사</div>
                         </div>
                         <div class="character-slot player-character" data-position="back-2">
                             <div class="hp-bar"><div class="hp-bar-fill" style="width: 90%;"></div></div>
                             <div class="shield-bar"><div class="shield-bar-fill" style="width: 40%;"></div></div>
-                            <div class="character-sprite">✨</div>
-                            <div class="character-info">힐러</div>
+                            <div class="character-sprite">🕊️</div>
+                            <div class="character-info">💚 힐러</div>
                         </div>
                     </div>
                 </div>
@@ -500,124 +581,124 @@
                         <div class="character-slot enemy-character" data-position="front-1">
                             <div class="hp-bar"><div class="hp-bar-fill" style="width: 70%;"></div></div>
                             <div class="shield-bar"><div class="shield-bar-fill" style="width: 20%;"></div></div>
-                            <div class="character-sprite">👺</div>
-                            <div class="character-info">고블린</div>
+                            <div class="character-sprite">👹</div>
+                            <div class="character-info">👹 고블린</div>
                         </div>
                         <div class="character-slot enemy-character" data-position="front-2">
                             <div class="hp-bar"><div class="hp-bar-fill" style="width: 90%;"></div></div>
                             <div class="shield-bar"><div class="shield-bar-fill" style="width: 60%;"></div></div>
-                            <div class="character-sprite">👹</div>
-                            <div class="character-info">오크</div>
+                            <div class="character-sprite">👺</div>
+                            <div class="character-info">💀 오크</div>
                         </div>
                     </div>
                     <div class="formation-row back-row">
                         <div class="character-slot enemy-character" data-position="back-1">
                             <div class="hp-bar"><div class="hp-bar-fill" style="width: 50%;"></div></div>
                             <div class="shield-bar"><div class="shield-bar-fill" style="width: 10%;"></div></div>
-                            <div class="character-sprite">🧙</div>
-                            <div class="character-info">샤먼</div>
+                            <div class="character-sprite">🧙‍♂️</div>
+                            <div class="character-info">🌙 샤먼</div>
                         </div>
                         <div class="character-slot enemy-character" data-position="back-2">
                             <div class="hp-bar"><div class="hp-bar-fill" style="width: 85%;"></div></div>
                             <div class="shield-bar"><div class="shield-bar-fill" style="width: 0%;"></div></div>
                             <div class="character-sprite">🏹</div>
-                            <div class="character-info">궁수</div>
+                            <div class="character-info">🎯 궁수</div>
                         </div>
                     </div>
                 </div>
             </div>
             <div id="battle-log">
-                <p>전투가 시작되었습니다.</p>
-                <p class="damage">전사가 고블린에게 <strong>45</strong> 데미지를 입혔습니다.</p>
-                <p class="skill">마법사가 <strong>파이어 월</strong> 스킬을 사용했습니다.</p>
-                <p class="damage">마법사가 오크에게 <strong>30</strong> 데미지를 입혔습니다.</p>
-                <p class="damage">마법사가 고블린에게 <strong>30</strong> 데미지를 입혔습니다.</p>
-                <p class="heal">힐러가 전사를 <strong>25</strong> 회복시켰습니다.</p>
-                <p class="shield">기사가 자신에게 <strong>15</strong> 방어막을 생성했습니다.</p>
+                <p>⚔️ 전투가 시작되었습니다!</p>
+                <p class="damage">🗡️ 전사가 👹 고블린에게 <strong>45</strong> 데미지를 입혔습니다!</p>
+                <p class="skill">🔥 마법사가 <strong>파이어 월</strong> 스킬을 사용했습니다!</p>
+                <p class="damage">🔥 마법사가 👺 오크에게 <strong>30</strong> 데미지를 입혔습니다!</p>
+                <p class="damage">🔥 마법사가 👹 고블린에게 <strong>30</strong> 데미지를 입혔습니다!</p>
+                <p class="heal">💚 힐러가 🗡️ 전사를 <strong>25</strong> 회복시켰습니다!</p>
+                <p class="shield">🛡️ 기사가 자신에게 <strong>15</strong> 방어막을 생성했습니다!</p>
             </div>
         </div>
         <div id="sidebar">
             <div class="sidebar-panel" id="battle-control">
-                <div class="panel-title">전투 조작</div>
-                <button id="start-battle">전투 시작</button>
-                <button id="auto-battle">자동 전투</button>
-                <button id="skip-battle">전투 건너뛰기</button>
-                <button id="retreat">후퇴</button>
+                <div class="panel-title">⚔️ 전투 조작</div>
+                <button id="start-battle">🚀 전투 시작</button>
+                <button id="auto-battle">🤖 자동 전투</button>
+                <button id="skip-battle">⏭️ 전투 건너뛰기</button>
+                <button id="retreat">🏃‍♂️ 후퇴</button>
             </div>
             <div class="sidebar-panel" id="turn-order-panel">
-                <div class="panel-title">턴 순서</div>
+                <div class="panel-title">⏰ 턴 순서</div>
                 <div class="turn-list">
                     <div class="turn-item player-side">
-                        <div class="turn-icon"></div>
+                        <div class="turn-icon">🗡️</div>
                         <div class="turn-name">전사</div>
                         <div class="turn-weight">12</div>
                     </div>
                     <div class="turn-item player-side">
-                        <div class="turn-icon"></div>
+                        <div class="turn-icon">🔮</div>
                         <div class="turn-name">마법사</div>
                         <div class="turn-weight">15</div>
                     </div>
                     <div class="turn-item enemy-side">
-                        <div class="turn-icon"></div>
+                        <div class="turn-icon">👹</div>
                         <div class="turn-name">고블린</div>
                         <div class="turn-weight">18</div>
                     </div>
                     <div class="turn-item player-side">
-                        <div class="turn-icon"></div>
+                        <div class="turn-icon">🛡️</div>
                         <div class="turn-name">기사</div>
                         <div class="turn-weight">20</div>
                     </div>
                     <div class="turn-item enemy-side">
-                        <div class="turn-icon"></div>
+                        <div class="turn-icon">🧙‍♂️</div>
                         <div class="turn-name">샤먼</div>
                         <div class="turn-weight">22</div>
                     </div>
                     <div class="turn-item player-side">
-                        <div class="turn-icon"></div>
+                        <div class="turn-icon">🕊️</div>
                         <div class="turn-name">힐러</div>
                         <div class="turn-weight">25</div>
                     </div>
                     <div class="turn-item enemy-side">
-                        <div class="turn-icon"></div>
+                        <div class="turn-icon">👺</div>
                         <div class="turn-name">오크</div>
                         <div class="turn-weight">28</div>
                     </div>
                     <div class="turn-item enemy-side">
-                        <div class="turn-icon"></div>
+                        <div class="turn-icon">🏹</div>
                         <div class="turn-name">궁수</div>
                         <div class="turn-weight">30</div>
                     </div>
                 </div>
             </div>
             <div class="sidebar-panel" id="mercenary-panel">
-                <div class="panel-title">용병 목록</div>
+                <div class="panel-title">👥 용병 목록</div>
                 <div class="mercenary-list">
                     <div class="mercenary-item">
                         <div class="mercenary-icon">⚔️</div>
                         <div class="mercenary-details">
-                            <div class="mercenary-name">강철의 로간</div>
-                            <div class="mercenary-class">전사 Lv.5</div>
+                            <div class="mercenary-name">🛡️ 강철의 로간</div>
+                            <div class="mercenary-class">전사 Lv.5 ⭐⭐⭐⭐⭐</div>
                         </div>
                     </div>
                     <div class="mercenary-item">
-                        <div class="mercenary-icon">🔮</div>
+                        <div class="mercenary-icon">🔥</div>
                         <div class="mercenary-details">
-                            <div class="mercenary-name">불꽃의 아이리스</div>
-                            <div class="mercenary-class">마법사 Lv.4</div>
+                            <div class="mercenary-name">🔮 불꽃의 아이리스</div>
+                            <div class="mercenary-class">마법사 Lv.4 ⭐⭐⭐⭐</div>
                         </div>
                     </div>
                     <div class="mercenary-item">
                         <div class="mercenary-icon">✨</div>
                         <div class="mercenary-details">
-                            <div class="mercenary-name">빛의 미아</div>
-                            <div class="mercenary-class">힐러 Lv.3</div>
+                            <div class="mercenary-name">🌟 빛의 미아</div>
+                            <div class="mercenary-class">힐러 Lv.3 ⭐⭐⭐</div>
                         </div>
                     </div>
                     <div class="mercenary-item">
                         <div class="mercenary-icon">🛡️</div>
                         <div class="mercenary-details">
-                            <div class="mercenary-name">방패의 토르</div>
-                            <div class="mercenary-class">기사 Lv.5</div>
+                            <div class="mercenary-name">⚡ 방패의 토르</div>
+                            <div class="mercenary-class">기사 Lv.5 ⭐⭐⭐⭐⭐</div>
                         </div>
                     </div>
                 </div>
@@ -625,24 +706,360 @@
         </div>
     </div>
     
-    <!-- 용병 정보 모달 -->
-    <div id="mercenary-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">용병 정보</div>
-                <button class="modal-close">&times;</button>
-            </div>
-            <div class="modal-body">
-                <!-- 용병 정보가 들어갈 자리 -->
-            </div>
-            <div class="modal-footer">
-                <button class="modal-button secondary">취소</button>
-                <button class="modal-button primary">배치</button>
-            </div>
-        </div>
-    </div>
+    <!-- 스킬 이펙트를 위한 추가 스타일 -->
+    <style>
+        /* 추가 이모지 효과 */
+        .floating-emoji {
+            position: absolute;
+            pointer-events: none;
+            z-index: 1000;
+            font-size: 24px;
+            animation: float-up 2s ease-out forwards;
+        }
+        
+        @keyframes float-up {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1) rotate(0deg);
+            }
+            50% {
+                opacity: 0.8;
+                transform: translateY(-30px) scale(1.2) rotate(180deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-60px) scale(0.8) rotate(360deg);
+            }
+        }
+        
+        /* 체력바 개선 */
+        .hp-bar::before {
+            content: "💚";
+            position: absolute;
+            left: -20px;
+            top: -2px;
+            font-size: 10px;
+        }
+        
+        .shield-bar::before {
+            content: "🛡️";
+            position: absolute;
+            left: -20px;
+            top: -2px;
+            font-size: 10px;
+        }
+        
+        /* 전투 버튼 호버 효과 개선 */
+        #battle-control button:hover::before {
+            content: "✨";
+            position: absolute;
+            left: -20px;
+            animation: sparkle 0.5s ease infinite alternate;
+        }
+        
+        @keyframes sparkle {
+            0% { transform: scale(1) rotate(0deg); }
+            100% { transform: scale(1.2) rotate(180deg); }
+        }
+        
+        /* 전투 로그 아이콘 개선 */
+        #battle-log p::before {
+            margin-right: 5px;
+        }
+        
+        /* 턴 순서 애니메이션 */
+        .turn-item.active {
+            background: linear-gradient(145deg, rgba(255, 215, 0, 0.2), rgba(255, 255, 255, 0.1));
+            border-color: #ffd700;
+            animation: glow-pulse 1s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow-pulse {
+            0% { box-shadow: 0 0 5px rgba(255, 215, 0, 0.5); }
+            100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.8); }
+        }
+        
+        /* 캐릭터 상태 표시 */
+        .character-slot.dead {
+            filter: grayscale(100%) brightness(0.5);
+            opacity: 0.6;
+        }
+        
+        .character-slot.dead .character-sprite::after {
+            content: "💀";
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            font-size: 20px;
+            animation: death-pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes death-pulse {
+            0%, 100% { transform: scale(1); opacity: 0.7; }
+            50% { transform: scale(1.2); opacity: 1; }
+        }
+        
+        .character-slot.buffed::after {
+            content: "⬆️";
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            font-size: 16px;
+            animation: buff-shine 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes buff-shine {
+            0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.8; }
+            50% { transform: scale(1.1) rotate(180deg); opacity: 1; }
+        }
+        
+        .character-slot.debuffed::after {
+            content: "⬇️";
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            font-size: 16px;
+            animation: debuff-shake 1s ease-in-out infinite;
+        }
+        
+        @keyframes debuff-shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-2px); }
+            75% { transform: translateX(2px); }
+        }
+        
+        /* 배경 개선 */
+        #battlefield::after {
+            content: "🌤️";
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 30px;
+            opacity: 0.6;
+            animation: weather-drift 10s ease-in-out infinite;
+        }
+        
+        @keyframes weather-drift {
+            0%, 100% { transform: translateX(0) translateY(0); }
+            25% { transform: translateX(10px) translateY(-5px); }
+            50% { transform: translateX(-5px) translateY(-10px); }
+            75% { transform: translateX(-10px) translateY(5px); }
+        }
+        
+        /* 승리/패배 효과 */
+        .victory-effect {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10000;
+        }
+        
+        .victory-emoji {
+            position: absolute;
+            font-size: 50px;
+            animation: victory-celebrate 3s ease-out forwards;
+        }
+        
+        @keyframes victory-celebrate {
+            0% {
+                transform: translateY(100vh) rotate(0deg) scale(0);
+                opacity: 0;
+            }
+            50% {
+                transform: translateY(50vh) rotate(720deg) scale(1.5);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-50px) rotate(1080deg) scale(1);
+                opacity: 0;
+            }
+        }
+    </style>
     
     <!-- 게임 스크립트 -->
-    <script type="module" src="js/game.js"></script>
+    <script>
+        // 간단한 게임 로직 데모
+        document.addEventListener('DOMContentLoaded', function() {
+            // 전투 버튼 이벤트
+            const startBattle = document.getElementById('start-battle');
+            const autoBattle = document.getElementById('auto-battle');
+            const skipBattle = document.getElementById('skip-battle');
+            const retreat = document.getElementById('retreat');
+            const battleLog = document.getElementById('battle-log');
+            
+            // 데미지 효과 함수
+            function showDamageEffect(element, damage, type = 'damage') {
+                const damageText = document.createElement('div');
+                damageText.className = 'damage-text';
+                damageText.style.color = type === 'heal' ? '#51cf66' : type === 'shield' ? '#74c0fc' : '#ff6b6b';
+                
+                // 타입별 이모지 추가
+                const emoji = type === 'heal' ? '💚+' : type === 'shield' ? '🛡️+' : '💥-';
+                damageText.textContent = emoji + damage;
+                
+                const rect = element.getBoundingClientRect();
+                damageText.style.left = (rect.left + rect.width / 2) + 'px';
+                damageText.style.top = (rect.top + rect.height / 2) + 'px';
+                damageText.style.position = 'fixed';
+                
+                document.body.appendChild(damageText);
+                
+                setTimeout(() => {
+                    document.body.removeChild(damageText);
+                }, 1200);
+            }
+            
+            // 이모지 효과 함수
+            function createFloatingEmoji(x, y, emoji) {
+                const floatingEmoji = document.createElement('div');
+                floatingEmoji.className = 'floating-emoji';
+                floatingEmoji.textContent = emoji;
+                floatingEmoji.style.left = x + 'px';
+                floatingEmoji.style.top = y + 'px';
+                floatingEmoji.style.position = 'fixed';
+                
+                document.body.appendChild(floatingEmoji);
+                
+                setTimeout(() => {
+                    document.body.removeChild(floatingEmoji);
+                }, 2000);
+            }
+            
+            // 전투 로그 추가 함수
+            function addBattleLog(message, type = '') {
+                const p = document.createElement('p');
+                p.className = type;
+                p.innerHTML = message;
+                battleLog.appendChild(p);
+                battleLog.scrollTop = battleLog.scrollHeight;
+            }
+            
+            // 전투 시작 버튼
+            startBattle.addEventListener('click', function() {
+                addBattleLog('🎺 전투 시작! 모든 용사들이 전투 준비를 마쳤습니다!');
+                
+                // 턴 순서에 활성화 효과 추가
+                const firstTurn = document.querySelector('.turn-item');
+                firstTurn.classList.add('active');
+                
+                // 3초 후 첫 번째 공격 시뮬레이션
+                setTimeout(() => {
+                    const warrior = document.querySelector('[data-position="front-1"]');
+                    warrior.classList.add('attack-animation');
+                    showDamageEffect(document.querySelector('.enemy-character[data-position="front-1"]'), 45);
+                    addBattleLog('⚔️ 전사가 👹 고블린을 강력하게 공격했습니다!', 'damage');
+                    
+                    setTimeout(() => {
+                        warrior.classList.remove('attack-animation');
+                    }, 600);
+                }, 1000);
+            });
+            
+            // 자동 전투 버튼
+            autoBattle.addEventListener('click', function() {
+                addBattleLog('🤖 자동 전투 모드가 활성화되었습니다!', 'skill');
+                
+                // 자동 전투 시뮬레이션
+                let turnCount = 0;
+                const autoInterval = setInterval(() => {
+                    turnCount++;
+                    
+                    if (turnCount > 10) {
+                        clearInterval(autoInterval);
+                        addBattleLog('🏆 승리! 모든 적을 물리쳤습니다!', 'skill');
+                        showVictoryEffect();
+                        return;
+                    }
+                    
+                    // 랜덤 액션 시뮬레이션
+                    const actions = [
+                        { msg: '🗡️ 전사가 적을 공격했습니다!', type: 'damage', emoji: '⚔️' },
+                        { msg: '🔮 마법사가 마법을 시전했습니다!', type: 'skill', emoji: '✨' },
+                        { msg: '💚 힐러가 아군을 치료했습니다!', type: 'heal', emoji: '💖' },
+                        { msg: '🛡️ 기사가 방어했습니다!', type: 'shield', emoji: '🛡️' }
+                    ];
+                    
+                    const randomAction = actions[Math.floor(Math.random() * actions.length)];
+                    addBattleLog(randomAction.msg, randomAction.type);
+                    
+                    // 랜덤 위치에 이모지 효과
+                    createFloatingEmoji(
+                        Math.random() * window.innerWidth,
+                        Math.random() * window.innerHeight,
+                        randomAction.emoji
+                    );
+                    
+                }, 800);
+            });
+            
+            // 승리 효과 함수
+            function showVictoryEffect() {
+                const victoryEffect = document.createElement('div');
+                victoryEffect.className = 'victory-effect';
+                document.body.appendChild(victoryEffect);
+                
+                const victoryEmojis = ['🎉', '🏆', '⭐', '🎊', '🌟', '🎁'];
+                
+                for (let i = 0; i < 20; i++) {
+                    setTimeout(() => {
+                        const emoji = document.createElement('div');
+                        emoji.className = 'victory-emoji';
+                        emoji.textContent = victoryEmojis[Math.floor(Math.random() * victoryEmojis.length)];
+                        emoji.style.left = Math.random() * window.innerWidth + 'px';
+                        victoryEffect.appendChild(emoji);
+                    }, i * 100);
+                }
+                
+                setTimeout(() => {
+                    document.body.removeChild(victoryEffect);
+                }, 4000);
+            }
+            
+            // 용병 클릭 이벤트
+            document.querySelectorAll('.mercenary-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    this.style.transform = 'scale(0.95)';
+                    addBattleLog('👥 ' + this.querySelector('.mercenary-name').textContent + '을(를) 선택했습니다!');
+                    
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 200);
+                });
+            });
+            
+            // 캐릭터 슬롯 호버 효과
+            document.querySelectorAll('.character-slot').forEach(slot => {
+                slot.addEventListener('mouseenter', function() {
+                    createFloatingEmoji(
+                        this.getBoundingClientRect().left + this.offsetWidth / 2,
+                        this.getBoundingClientRect().top,
+                        '✨'
+                    );
+                });
+            });
+            
+            // 건너뛰기 버튼
+            skipBattle.addEventListener('click', function() {
+                addBattleLog('⏭️ 전투를 건너뛰었습니다!', 'skill');
+                showVictoryEffect();
+            });
+            
+            // 후퇴 버튼
+            retreat.addEventListener('click', function() {
+                addBattleLog('🏃‍♂️ 전술적 후퇴를 실행했습니다!');
+                
+                // 캐릭터들이 후퇴하는 애니메이션 효과
+                document.querySelectorAll('.player-character').forEach((char, index) => {
+                    setTimeout(() => {
+                        char.style.transform = 'translateX(-100px)';
+                        char.style.opacity = '0.5';
+                    }, index * 200);
+                });
+            });
+        });
+    </script>
 </body>
 </html>
