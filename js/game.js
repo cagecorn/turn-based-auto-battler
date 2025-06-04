@@ -1,3 +1,5 @@
+import { BattleManager } from './battle.js';
+
 // 게임 전체를 관리하는 모듈
 const Game = (() => {
     // 게임 상태
@@ -12,13 +14,10 @@ const Game = (() => {
     };
 
     // 초기화
-    import { startBattle } from './battle.js';
-    
     function init() {
         console.log("게임 초기화 중...");
         loadGameData();
         UI.init();
-startBattle();
         bindEvents();
         console.log("게임 초기화 완료!");
     }
