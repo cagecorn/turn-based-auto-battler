@@ -1,5 +1,15 @@
 // UI 관리 모듈
 const UI = (() => {
+    const classEmojis = {
+        warrior: '⚔️',
+        knight: '🛡️',
+        mage: '🔮',
+        healer: '✨',
+        archer: '🏹',
+        goblin: '👺',
+        orc: '👹',
+        shaman: '🧙'
+    };
     // 초기화
     function init() {
         console.log("UI 초기화 중...");
@@ -41,9 +51,9 @@ const UI = (() => {
             const mercenaryItem = document.createElement('div');
             mercenaryItem.className = 'mercenary-item';
             mercenaryItem.dataset.id = mercenary.id;
-            
+
             mercenaryItem.innerHTML = `
-                <div class="mercenary-icon" style="background-image: url('assets/${mercenary.class}.png');"></div>
+                <div class="mercenary-icon">${classEmojis[mercenary.class] || '❓'}</div>
                 <div class="mercenary-details">
                     <div class="mercenary-name">${mercenary.name}</div>
                     <div class="mercenary-class">${mercenary.class.charAt(0).toUpperCase() + mercenary.class.slice(1)} Lv.${mercenary.level}</div>
@@ -69,7 +79,7 @@ const UI = (() => {
         // 용병 정보 설정
         modalBody.innerHTML = `
             <div class="mercenary-detail">
-                <div class="mercenary-portrait" style="background-color: #3a3f48; width: 80px; height: 120px; margin: 0 auto 15px; background-image: url('assets/${mercenary.class}.png'); background-size: contain; background-repeat: no-repeat; background-position: center;"></div>
+                <div class="mercenary-portrait">${classEmojis[mercenary.class] || '❓'}</div>
                 <div class="mercenary-info">
                     <h3>${mercenary.name}</h3>
                     <p>클래스: ${mercenary.class.charAt(0).toUpperCase() + mercenary.class.slice(1)} (Lv.${mercenary.level})</p>
