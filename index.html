@@ -19,6 +19,82 @@
             flex-direction: column;
             height: 100vh;
         }
+
+        #nav-bar {
+            display: flex;
+            justify-content: center;
+            background: linear-gradient(145deg, #2a2e35, #34495e);
+            padding: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-button {
+            padding: 12px 25px;
+            margin: 0 10px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(145deg, #3a3f48, #2c3e50);
+            color: #e1e1e1;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .nav-button.active {
+            background: linear-gradient(145deg, #3498db, #2980b9);
+            border-color: #3498db;
+        }
+
+        #resource-bar {
+            display: flex;
+            justify-content: center;
+            background: linear-gradient(145deg, rgba(0, 0, 0, 0.4), rgba(255, 255, 255, 0.05));
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .resource-item {
+            display: flex;
+            align-items: center;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.2));
+            padding: 8px 15px;
+            margin: 0 10px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .resource-icon {
+            font-size: 20px;
+            margin-right: 8px;
+        }
+
+        .resource-amount {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        #main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
         
         #game-container {
             display: flex;
@@ -543,8 +619,22 @@
     </style>
 </head>
 <body>
-    <div id="game-container">
-        <div id="battle-area">
+    <div id="nav-bar">
+        <button class="nav-button active" onclick="showScreen('battle')">⚔️ 전투</button>
+        <button class="nav-button" onclick="showScreen('mercenary')">👥 용병 고용</button>
+        <button class="nav-button" onclick="showScreen('territory')">🏰 영지 관리</button>
+    </div>
+    <div id="resource-bar">
+        <div class="resource-item"><span class="resource-icon">💰</span><span class="resource-amount" id="gold-amount">2,500</span></div>
+        <div class="resource-item"><span class="resource-icon">🌾</span><span class="resource-amount" id="food-amount">450</span></div>
+        <div class="resource-item"><span class="resource-icon">🪨</span><span class="resource-amount" id="stone-amount">320</span></div>
+        <div class="resource-item"><span class="resource-icon">🪵</span><span class="resource-amount" id="wood-amount">180</span></div>
+        <div class="resource-item"><span class="resource-icon">⚡</span><span class="resource-amount" id="energy-amount">75</span></div>
+    </div>
+    <div id="main-container">
+        <div id="battle-screen" class="screen active">
+            <div id="game-container">
+                <div id="battle-area">
             <div id="battlefield">
                 <div id="player-side">
                     <div class="formation-row front-row">
@@ -704,8 +794,15 @@
                 </div>
             </div>
         </div>
-    </div>
-    
+        </div><!-- battle-screen end -->
+        <div id="mercenary-screen" class="screen">
+            <p style="text-align:center;margin-top:20px;">용병 고용 화면 준비중</p>
+        </div>
+        <div id="territory-screen" class="screen">
+            <p style="text-align:center;margin-top:20px;">영지 관리 화면 준비중</p>
+        </div>
+    </div><!-- main-container end -->
+
     <!-- 스킬 이펙트를 위한 추가 스타일 -->
     <style>
         /* 추가 이모지 효과 */
@@ -881,6 +978,15 @@
     
     <!-- 게임 스크립트 -->
     <script>
+        function showScreen(name) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-button').forEach(b => b.classList.remove('active'));
+            const target = document.getElementById(name + '-screen');
+            if (target) target.classList.add('active');
+            const btn = Array.from(document.querySelectorAll('.nav-button')).find(b => b.getAttribute('onclick') === `showScreen('${name}')`);
+            if (btn) btn.classList.add('active');
+        }
+
         // 간단한 게임 로직 데모
         document.addEventListener('DOMContentLoaded', function() {
             // 전투 버튼 이벤트
